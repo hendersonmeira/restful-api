@@ -1,2 +1,2 @@
-# RESTful API
-Implementando uma API RESTful usando NodeJS, Express e MongoDB.
+# RESTfull-api
+Implementando uma API Restfull usando NodeJS, ExpressJS e MongoDB

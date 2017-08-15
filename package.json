@@ -1,26 +1,27 @@
 {
-  "name": "restful-api",
+  "name": "restfull-api",
   "version": "1.0.0",
-  "description": "Implementando uma API RESTful usando NodeJS, Express e MongoDB.",
-  "main": "app.js",
+  "description": "Implementando uma API Restfull usando NodeJS, ExpressJS e MongoDB",
+  "main": "index.js",
   "scripts": {
     "test": ""
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hendersonmeira/restful-api.git"
+    "url": "git+https://github.com/HelioVieiraSilvaJr/restfull-api.git"
   },
   "keywords": [],
-  "author": "Henderson Meira",
+  "author": "HelioVieiraSilvaJr (helio.engenharia@gmail.com)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hendersonmeira/restful-api/issues"
+    "url": "https://github.com/HelioVieiraSilvaJr/restfull-api/issues"
   },
-  "homepage": "https://github.com/hendersonmeira/restful-api#readme",
+  "homepage": "https://github.com/HelioVieiraSilvaJr/restfull-api#readme",
   "dependencies": {
     "babel-cli": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "eslint": "^4.4.1",
-    "express": "^4.15.4"
+    "express": "^4.15.4",
+    "moment": "^2.18.1"
   }
 }
