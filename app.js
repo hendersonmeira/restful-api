@@ -23,7 +23,7 @@ const customerSchema = new Schema({
   creatAt: { type: Date, default: Date.now }
 })
 
-// Customer Model (Interface) **** Observation **** Registering the model to use Mongoose. To manipulate Mongo. 
+// Customer Model **** Observation **** Registering the model to use Mongoose. To manipulate Mongo. 
 const CostumerModel = mongoose.model('costumers', customerSchema)
 //console.log(CustomerModel)
 
@@ -84,20 +84,29 @@ if (err) res.sendStatus(404)
 
 // POST /costumers
 app.post('/costumers', (req, res) => {
-  console.log(req.body)
-  res.status(201).send('POST')
+  //console.log(req.body)
+  CostumerModel.create(req.body, function(err, costumer) {
+    if (err) res.sendStatus(412)
+    res.status(201).send(costumer)
+  })
 })
 
 // PUT /costumers/1
 app.put('/costumers/:id', (req, res) => {
-  console.log(req.params)
-  res.SendStatus(204)
+  //console.log(req.params)
+    CostumerModel.findByIdAndUpdate(req.params.id, req.body, function(err) {
+    if (err) res.sendStatus(404)
+      res.sendStatus(204)
+  })
 })
 
 // DELETE /costumers/1
 app.delete('/costumers/:id', (req, res) => {
-  console.log(req.params)
-  res.status(204).end()
+  //console.log(req.params)
+  CostumerModel.findByIdAndRemove(req.params.id, function(err) {
+    if (err) res.sendStatus(404)
+    res.sendStatus(204).end()
+  })
 })
 
 
