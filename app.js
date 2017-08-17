@@ -1,85 +1,108 @@
+const PORT = 3000
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+// const model = mongoose.model
 const express = require('express')
-const app = express()
 const moment = require('moment')
-const PORT = 3000;
+const bodyParser = require('body-parser')
+const app = express()
+
+// Mongoose Connection
+mongoose.connect('mongodb://localhost/local', { useMongoClient: true })
+
+// Creat Customer Schema
+const customerSchema = new Schema({
+  name: String,
+  email: String,
+  phone: String,
+  birthDay: Date,
+  weight: Number,
+  height: Number,
+  sex: String,
+  rich: Boolean,
+  creatAt: { type: Date, default: Date.now }
+})
+
+// Customer Model (Interface) **** Observation **** Registering the model to use Mongoose. To manipulate Mongo. 
+const CostumerModel = mongoose.model('costumers', customerSchema)
+//console.log(CustomerModel)
 
 // Middlewares
-const requestCurrentTime = function(req, res, next){
+// Custom CurrentTime
+const requestCurrentTime = function (req, res, next) {
   moment.locale('pt-br')
-  req.currentTime = moment().format('LLLL')
+  req.currentTime = moment().format('lll')
   next()
 }
 
-
-
-
-// Custom middlewares - registering time and hour from your requisition. 
-// Custom logger
-const myLogger = function(req, res, next){
-  console.log(` ${req.currentTime} ==> ${req.method} ${req.url}`)
+// Custom Logger
+const myLogger = function (req, res, next) {
+  console.log(`${req.currentTime} ==> ${req.method} ${req.url}`)
   next()
 }
 
+// Register Middlewares
 app.use(requestCurrentTime)
 app.use(myLogger)
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true}))
 
-//Routes
+// Routes
 // GET /
 app.get('/', (req, res) => {
-  console.log('Bateu na rota rais')
-  res.send('resposta pela barra')
+  const apiInfo = {
+    name: 'RESTful API',
+    version: '1.0.0'
+  }
+
+  res.send(apiInfo)
 })
 
-// ALL
-app.all('/costumers', function (req, res, next) {
-  next()
-})
-
-app.get('/helio', (req, res) => {
-  res.send('Respondeu pelo Helio')
-})
+// ALL /costumers
+// app.all('/costumers', function (req, res, next) {
+//   console.log(`${req.method} /costumers`)
+//   next()
+// })
 
 // GET /costumers
 app.get('/costumers', (req, res) => {
-  const costumers = [
-    {
-      id: 1,
-      nome: "Pessoa 01",
-      email: "pessoa1@email.com"
-    },
-    {
-      id: 2,
-      name: "Pessoa 02",
-      email: "pessoa2@email.com"
-    },
-    {
-      id: 3,
-      name: "Pessoa 03",
-      email: "pessoa3@email.com"
-    }
-  ]
+  CostumerModel.find({}, function(err, costumers) {
+    if (err) res.sendStatus(404)
+    res.status(200).send(costumers)
+  })
+})
 
-  res.send(costumers)
+// GET /costumers/1
+app.get('/costumers/:id', (req, res) => {
+ // console.log(req.params)
+  // Fazendo uma rota para pegar o dado pelo id
+  CostumerModel.findById(req.params.id, function(err, costumer) {
+if (err) res.sendStatus(404)
+  res.status(200).send(costumer)
+  }) 
 })
 
 // POST /costumers
-app.post('/costumers', function(req, res){
-  res.send('POST')
+app.post('/costumers', (req, res) => {
+  console.log(req.body)
+  res.status(201).send('POST')
 })
 
-// PUT /costumers
-app.put('/costumers', function (req, res) {
-  res.send('PUT')
+// PUT /costumers/1
+app.put('/costumers/:id', (req, res) => {
+  console.log(req.params)
+  res.SendStatus(204)
 })
 
-// Delete /costumers
-app.delete('/costumers', function(req, res){
-  res.send('DELETE')
+// DELETE /costumers/1
+app.delete('/costumers/:id', (req, res) => {
+  console.log(req.params)
+  res.status(204).end()
 })
+
 
 app.listen(PORT, () => {
-  //console.log('servidor rodando na porta ' + PORT)
-  // ES6 Template String
-  console.log(`Rodando nova mensagem ${PORT} => ok...`)
+  // console.log('Servidor rodando na porta ' + PORT + '...')
+  // ES6 Template String:
+  console.log(`Servidor rodando na porta ${PORT}...`)
 })
-
