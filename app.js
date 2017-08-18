@@ -1,17 +1,28 @@
-const PORT = 3000
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 // const model = mongoose.model
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
+// App Config
+const fs = require('fs')
+const env = require('node-env-file')
+const envFile = __dirname + '/.env'
+if (fs.existsSync(envFile)) env(envFile)
+
+console.log(process.env.PORT)
+app.set('MONGO_CONNECTION', process.env.MONGO_CONNECTION)
+
+app.set('PORT', process.env.PORT)
+
+// Midlewares
 const currentTime = require('./middlewares/current-time.js')
 const myLogger = require('./middlewares/my-logger.js')
 const productsSchema = require('./schemas/products.js')
 const customerSchema = require('./schemas/costumers.js')
 
 // Mongoose Connection
-mongoose.connect('mongodb://localhost/local', { useMongoClient: true })
+mongoose.connect(app.get('MONGO_CONNECTION'), { useMongoClient: true })
 
 
 // Customer Model **** Observation **** Registering the model to use Mongoose. To manipulate Mongo. 
@@ -136,8 +147,8 @@ ProductsModel.findByIdAndRemove(req.params.id, function(err) {
 
 
 
-app.listen(PORT, () => {
+app.listen(app.get('PORT'), () => {
   // console.log('Servidor rodando na porta ' + PORT + '...')
   // ES6 Template String:
-  console.log(`Servidor rodando na porta ${PORT}...`)
+  console.log(`Servidor rodando na porta ${app.get('PORT')}...`)
 })
