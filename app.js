@@ -3,66 +3,55 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 // const model = mongoose.model
 const express = require('express')
-const moment = require('moment')
 const bodyParser = require('body-parser')
 const app = express()
+const currentTime = require('./middlewares/current-time.js')
+const myLogger = require('./middlewares/my-logger.js')
+const productsSchema = require('./schemas/products.js')
+const customerSchema = require('./schemas/costumers.js')
 
 // Mongoose Connection
 mongoose.connect('mongodb://localhost/local', { useMongoClient: true })
 
-// Creat Customer Schema
-const customerSchema = new Schema({
-  name: String,
-  email: String,
-  phone: String,
-  birthDay: Date,
-  weight: Number,
-  height: Number,
-  sex: String,
-  rich: Boolean,
-  creatAt: { type: Date, default: Date.now }
-})
 
 // Customer Model **** Observation **** Registering the model to use Mongoose. To manipulate Mongo. 
 const CostumerModel = mongoose.model('costumers', customerSchema)
+
+// Products Model *** Observation *** Registering the model to use Mongoose. To manipulate Mongo. 
+const ProductsModel = mongoose.model('products', productsSchema)
 //console.log(CustomerModel)
 
-// Middlewares
-// Custom CurrentTime
-const requestCurrentTime = function (req, res, next) {
-  moment.locale('pt-br')
-  req.currentTime = moment().format('lll')
-  next()
-}
-
-// Custom Logger
-const myLogger = function (req, res, next) {
-  console.log(`${req.currentTime} ==> ${req.method} ${req.url}`)
-  next()
-}
-
-// Register Middlewares
-app.use(requestCurrentTime)
+// Register Middlewares to both applications
+app.use(currentTime)
 app.use(myLogger)
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true}))
 
-// Routes
+// Routes for all
 // GET /
 app.get('/', (req, res) => {
   const apiInfo = {
-    name: 'RESTful API',
+    name: 'RESTful API - Products Schema Lesson',
     version: '1.0.0'
   }
-
   res.send(apiInfo)
 })
 
 // ALL /costumers
-// app.all('/costumers', function (req, res, next) {
-//   console.log(`${req.method} /costumers`)
-//   next()
-// })
+app.all('/costumers', function (req, res, next) {
+  console.log(`${req.method} /costumers`)
+  next()
+})
+
+// GET /products
+app.get('/products', (req, res) => {
+  ProductsModel.find({}, function(err, products) {
+    if (err) res.sendStatus(404)
+      res.status(200).send(products)
+  })
+})
+
+
 
 // GET /costumers
 app.get('/costumers', (req, res) => {
@@ -74,7 +63,7 @@ app.get('/costumers', (req, res) => {
 
 // GET /costumers/1
 app.get('/costumers/:id', (req, res) => {
- // console.log(req.params)
+ console.log(req.params)
   // Fazendo uma rota para pegar o dado pelo id
   CostumerModel.findById(req.params.id, function(err, costumer) {
 if (err) res.sendStatus(404)
@@ -82,7 +71,15 @@ if (err) res.sendStatus(404)
   }) 
 })
 
-// POST /costumers
+// GET /products
+app.get('/products:id', (req, res) => {
+  ProductsModel.findById(req.params.id, function(err, products) {
+    if (err) res.sendStatus(404)
+      res.status(200).send(products)
+  })
+})
+
+// Post /costumers
 app.post('/costumers', (req, res) => {
   //console.log(req.body)
   CostumerModel.create(req.body, function(err, costumer) {
@@ -91,16 +88,35 @@ app.post('/costumers', (req, res) => {
   })
 })
 
-// PUT /costumers/1
-app.put('/costumers/:id', (req, res) => {
-  //console.log(req.params)
-    CostumerModel.findByIdAndUpdate(req.params.id, req.body, function(err) {
-    if (err) res.sendStatus(404)
-      res.sendStatus(204)
+
+// POST /products
+app.post('/products', (req, res) => {
+  ProductsModel.create(req.body, function(err, products) {
+    if (err) res.sendStatus(412)
+      res.status(201).send(products)
   })
 })
 
-// DELETE /costumers/1
+// PUT /costumers
+app.put('/costumers/:id', (req, res) => {
+  //console.log(req.params)
+  CostumerModel.findByIdAndUpdate(req.params.id, req.body, function (err) {
+    if (err) res.sendStatus(404)
+    res.sendStatus(204)
+  })
+})
+
+
+// PUT /products/1
+app.put('/products/:id', (req, res) => {
+  ProductsModel.findByIdAndUpdate(req.params.id, req.body, function (err) {
+    if (err) res.sendStatus(404)
+    res.sendStatus(204)
+  })
+})
+
+
+// DELETE /costumers
 app.delete('/costumers/:id', (req, res) => {
   //console.log(req.params)
   CostumerModel.findByIdAndRemove(req.params.id, function(err) {
@@ -108,6 +124,16 @@ app.delete('/costumers/:id', (req, res) => {
     res.sendStatus(204).end()
   })
 })
+
+
+// DELETE /products/1
+app.delete('/products/:id', (req, res) => {
+ProductsModel.findByIdAndRemove(req.params.id, function(err) {
+  if (err) res.sendStatus(404)
+    res.sendStatus(204).end()
+  })
+})
+
 
 
 app.listen(PORT, () => {

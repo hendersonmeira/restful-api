@@ -1,0 +1,11 @@
+Collection: products
+
+{
+    "name" : "Cafe",
+    "vendor": "Pilao",
+    "quantity" : 300,
+    "price": 9.90,
+    "weight" : 500,
+    "purchaseData": "10/01/2000",
+    "manufactureData" : "01/01/2000"
+}
