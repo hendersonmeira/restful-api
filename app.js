@@ -127,14 +127,7 @@ app.put('/products/:id', (req, res) => {
 })
 
 
-// DELETE /costumers
-app.delete('/costumers/:id', (req, res) => {
-  //console.log(req.params)
-  CostumerModel.findByIdAndRemove(req.params.id, function(err) {
-    if (err) res.sendStatus(404)
-    res.sendStatus(204).end()
-  })
-})
+
 
 
 // DELETE /products/1
@@ -145,6 +138,8 @@ ProductsModel.findByIdAndRemove(req.params.id, function(err) {
   })
 })
 
+const teste = require('./routes/costumers')(app, CostumerModel)
+console.log('======>', teste)
 
 
 app.listen(app.get('PORT'), () => {
